@@ -1,0 +1,37 @@
+class KthLargest {
+private static final int RANGE = 10000;
+private int[] freq = new int[2 * RANGE + 1];
+private boolean firstQuery = true;
+private int pos; // position of k'th largest element
+private int k;
+
+public KthLargest(int k, int[] nums) {
+    for(int num: nums) {
+        freq[num + RANGE]++;  // add RANGE to handle negative numbers, subtract RANGE to get actual value when returning answer
+    }
+    this.k = k;
+}
+
+public int add(int val) {
+    val += RANGE;
+    if(firstQuery) {
+        firstQuery = false;
+        freq[val]++;
+		// find pos for the first time
+        for(pos = freq.length - 1; k > freq[pos]; pos--) {
+            k -= freq[pos];
+        }
+		// change freq of pos to k. Example: data = [0, 1, 1, 1, 1, 1, 2, 2], k = 5 => we are only concerned with [1, 1, 1, 2, 2] hence change freq of 1 from 5 to 3 (k would have become 3 at this point)
+        freq[pos] = k;
+    } else {
+        if(val > pos) {
+            freq[val]++;
+			// shift 1 to the right: decrease current frequency and in case it became 0, move to the next non-zero frequency position
+            freq[pos]--;
+            while(freq[pos] == 0) {
+                pos++;
+            }
+        }
+    }
+    return pos - RANGE;
+}
