@@ -1,0 +1,59 @@
+For each cell on the board, count live neighbors
+If cell is dead and alive neighbors = 3, then, cell becomes alive
+Else if cell is alive and alive neighbors = 2 or 3, then cell lives on
+Else cell dies
+To do this in constant space, use the fact the all the cells on the board are 0 or 1 and are ints which have 32 bits data out of which only 1 bit is being used to represent 0 or 1
+So let the current state be there in the first bit (from right, i.e. LSB) and the next state in the second bit.
+After updating all the cells, right shift them by 1 bit, thereby representing the new state
+T/S: O(n)/O(1), where n = size(board) * size(board[0])
+
+private static final int[][] DIRS = {{-1, -1}, // top-left
+ 									 {-1, 0},  // top
+									 {-1, 1},  // top-right
+									 {0, -1},  // left
+									 {0, 1},   // right
+									 {1, -1},  // bottom-left
+									 {1, 0},   // bottom
+									 {1, 1}};  // bottom-right
+
+public void gameOfLife(int[][] board) {
+	var rows = board.length;
+	var cols = board[0].length;
+	playGame(board, rows, cols);
+	updateBoard(board, rows, cols);
+}
+
+private void playGame(int[][] board, int rows, int cols) {
+	for (var i = 0; i < rows; i++)
+		for (var j = 0; j < cols; j++) {
+			var alive = aliveNeighbors(board, rows, cols, i, j);
+			// Dead cell with 3 live neighbors becomes alive
+			if (board[i][j] == 0 && alive == 3)
+				board[i][j] = 2;
+			// Live cell with 2 or 3 live neighbors lives on
+			else if (board[i][j] == 1 && (alive == 2 || alive == 3))
+				board[i][j] = 3;
+		}
+}
+
+private int aliveNeighbors(int[][] board, int rows, int cols, int i, int j) {
+	var alive = 0;
+	for (var dir : DIRS) {
+		var neighborX = i + dir[0];
+		var neighborY = j + dir[1];
+		if (isOutOfBounds(rows, cols, neighborX, neighborY))
+			continue;
+		alive += board[neighborX][neighborY] & 1;
+	}
+	return alive;
+}
+
+private boolean isOutOfBounds(int rows, int cols, int x, int y) {
+	return x < 0 || x >= rows || y < 0 || y >= cols;
+}
+
+private void updateBoard(int[][] board, int rows, int cols) {
+	for (var i = 0; i < rows; i++)
+		for (var j = 0; j < cols; j++)
+			board[i][j] >>= 1;
+}
