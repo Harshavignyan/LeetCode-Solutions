@@ -1,0 +1,41 @@
+ITRATIVE APPROACH
+class Solution {
+    public TreeNode convertBST(TreeNode root) {
+        if(root == null) return null;
+        Stack<TreeNode> stack = new Stack<>();
+        TreeNode node = root;
+        int rightSum = 0;
+        while(node !=null || !stack.isEmpty()) {
+            while(node !=null) {
+                stack.push(node);
+                node = node.right;
+            }
+            node = stack.pop();
+            node.val += rightSum; 
+            rightSum =node.val;
+            node = node.left;           
+        }
+        return root;       
+        
+    }    
+
+}
+
+#################################################
+
+RECURSIVE APPROACH
+class Solution {
+    int sum = 0;
+    public TreeNode convertBST(TreeNode root) {
+        //base case
+        if (root == null)
+            return null;
+			convertBST(root.right);////go till end of right subtree to find max val
+        //increase this node by accumulated sum so far, then add this node to the sum
+        int t = root.val;
+        root.val+=sum;
+        sum += t;
+        convertBST(root.left);//go in the left subtree to update the sum
+        return root;
+    }
+}
